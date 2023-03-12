@@ -10,7 +10,7 @@ import {
 } from "@thirdweb-dev/react";
 import { NATIVE_TOKEN_ADDRESS } from "@thirdweb-dev/sdk";
 import { Network, Alchemy, BigNumber } from "alchemy-sdk";
-import { useEffect, useState } from "react";
+import { Key, useEffect, useState } from "react";
 
 const contractAddress = "0xf00B258929f1070D7F7405A35c38b01cE3C368C8";
 
@@ -25,21 +25,8 @@ export default function Profile() {
   const { mutateAsync: cancelDirectListing, isLoading: isCancelLoading } =
     useContractWrite(contract, "cancelDirectListing");
 
-  const settings = {
-    apiKey: "CIvIOZTTLp1-bXiU27BwfD9jEOJPfeCm",
-    network: Network.MATIC_MUMBAI,
-  };
-
   const [NFTS, setNfts] = useState<any>([]);
-  const [nftprice, setPrice] = useState<any>(0);
-
-  const alchemy = new Alchemy(settings);
-
-  async function loadNftsForOwner(address: string) {
-    const nfts = await alchemy.nft.getNftsForOwner(address);
-    console.log("nfts", nfts);
-    setNfts(nfts.ownedNfts as any);
-  }
+  const [nftprice, setPrice] = useState<string>("0");
 
   const {
     mutateAsync: createDirectListing,
@@ -48,6 +35,20 @@ export default function Profile() {
   } = useCreateDirectListing(contract);
 
   useEffect(() => {
+    const loadNftsForOwner = async (address: string) => {
+      try {
+        const settings = {
+          apiKey: "CIvIOZTTLp1-bXiU27BwfD9jEOJPfeCm",
+          network: Network.MATIC_MUMBAI,
+        };
+        const alchemy = new Alchemy(settings);
+        const nfts = await alchemy.nft.getNftsForOwner(address);
+        console.log("nfts", nfts);
+        setNfts(nfts.ownedNfts as any);
+      } catch (error) {
+        console.log(error);
+      }
+    };
     if (address) {
       loadNftsForOwner(address);
     }
@@ -62,67 +63,74 @@ export default function Profile() {
           {!address && <div>No wallet connected</div>}
           {address && <div>My wallet address is {address}</div>}
         </div>
-        // nfts owner
         <div>
           <h1>NFTSs owner</h1>
           <div>
             {NFTS.length == 0 && <p>Loading ...</p>}
             {NFTS &&
-              NFTS.map((nft, index) => {
-                return (
-                  <div key={index}>
-                    <MediaRenderer
-                      src={nft.rawMetadata.image}
-                      width="200px"
-                      height="200px"
-                    />
-                    <div>
-                      <input
-                        id="price"
-                        placeholder="Price"
-                        min="0"
-                        step="0.0001"
-                        type="number"
-                        onChange={(e) => {
-                          console.log("e", e.target.value);
-                          setPrice(e.target.value);
-                        }}
+              NFTS.map(
+                (
+                  nft: {
+                    rawMetadata: { image: string | null | undefined };
+                    contract: { address: any };
+                    tokenId: any;
+                  },
+                  index: Key | null | undefined
+                ) => {
+                  return (
+                    <div key={index}>
+                      <MediaRenderer
+                        src={nft.rawMetadata.image}
+                        width="200px"
+                        height="200px"
                       />
-                    </div>
-                    <Web3Button
-                      contractAddress={contractAddress}
-                      action={async (e) => {
-                        try {
-                          await createDirectListing({
-                            assetContractAddress: nft.contract.address,
-                            tokenId: nft.tokenId,
-                            buyoutPricePerToken: 0.0001,
-                            quantity: "1",
-                            currencyContractAddress: NATIVE_TOKEN_ADDRESS,
-                            startTimestamp: new Date(),
-                            listingDurationInSeconds: 0,
-                          });
-                        } catch (error) {
-                          console.log(error);
-                        }
-                      }}
-                    >
-                      Create Listing
-                    </Web3Button>
+                      <div>
+                        <input
+                          id="price"
+                          placeholder="Price"
+                          min="0"
+                          step="0.0001"
+                          type="number"
+                          onChange={(e) => {
+                            console.log("e", e.target.value);
+                            setPrice(e.target.value);
+                          }}
+                        />
+                      </div>
+                      <Web3Button
+                        contractAddress={contractAddress}
+                        action={async (e) => {
+                          try {
+                            await createDirectListing({
+                              assetContractAddress: nft.contract.address,
+                              tokenId: nft.tokenId,
+                              buyoutPricePerToken: nftprice,
+                              quantity: "1",
+                              currencyContractAddress: NATIVE_TOKEN_ADDRESS,
+                              startTimestamp: new Date(),
+                              listingDurationInSeconds: 0,
+                            });
+                          } catch (error) {
+                            console.log(error);
+                          }
+                        }}
+                      >
+                        Create Listing
+                      </Web3Button>
 
-                    <button
-                      onClick={async () => {
-                        console.log("price", nftprice);
-                      }}
-                    >
-                      {isCreateLoading ? "loading .. " : "Create Listing"}
-                    </button>
-                  </div>
-                );
-              })}
+                      <button
+                        onClick={async () => {
+                          console.log("price", nftprice);
+                        }}
+                      >
+                        {isCreateLoading ? "loading .. " : "Create Listing"}
+                      </button>
+                    </div>
+                  );
+                }
+              )}
           </div>
         </div>
-        // nfts listing
         <div>
           <h1>NFTs Listing owner </h1>
           <div>
