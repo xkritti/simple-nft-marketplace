@@ -9,10 +9,10 @@ import {
   Web3Button,
 } from "@thirdweb-dev/react";
 import { NATIVE_TOKEN_ADDRESS } from "@thirdweb-dev/sdk";
-import { Network, Alchemy, BigNumber } from "alchemy-sdk";
+import { Network, Alchemy } from "alchemy-sdk";
 import { Key, useEffect, useState } from "react";
 
-const contractAddress = "0xf00B258929f1070D7F7405A35c38b01cE3C368C8";
+const contractAddress = process.env.MARKET_ADDRESS || "";
 
 export default function Profile() {
   const address = useAddress();
@@ -38,7 +38,7 @@ export default function Profile() {
     const loadNftsForOwner = async (address: string) => {
       try {
         const settings = {
-          apiKey: "CIvIOZTTLp1-bXiU27BwfD9jEOJPfeCm",
+          apiKey: process.env.ALCHEMY_API_KEY,
           network: Network.MATIC_MUMBAI,
         };
         const alchemy = new Alchemy(settings);
