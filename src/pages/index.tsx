@@ -16,16 +16,18 @@ export default function Home() {
 
   return (
     <div>
-      <main>
-        <h1>NFTs Marketplace (mumbai) </h1>
-        <ConnectWallet />
+      <main className="h-screen bg-white flex flex-col items-center">
+        <p className=" text-black text-xl my-10">NFTs Marketplace (mumbai) </p>
         {!isLoading ? (
-          <div>
+          <div className="flex justify-center items-center ">
             {nfts &&
               nfts.map((nft, index) => {
                 console.log("nft", nft);
                 return (
-                  <div key={index}>
+                  <div
+                    className=" flex rounded-md shadow-lg bg-slate-200 items-center justify-center flex-col text-black w-52 h-fit p-4 m-4"
+                    key={index}
+                  >
                     <MediaRenderer
                       src={nft.asset.image}
                       width={"200px"}
@@ -38,6 +40,7 @@ export default function Home() {
                       MATIC
                     </p>
                     <button
+                      className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mt-4"
                       onClick={async () => {
                         try {
                           await contract?.buyoutListing(

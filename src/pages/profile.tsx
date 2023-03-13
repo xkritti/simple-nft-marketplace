@@ -58,7 +58,6 @@ export default function Profile() {
     <div>
       <main>
         <h1>NFTs explore (mumbai) </h1>
-        <ConnectWallet />
         <div>
           {!address && <div>No wallet connected</div>}
           {address && <div>My wallet address is {address}</div>}
