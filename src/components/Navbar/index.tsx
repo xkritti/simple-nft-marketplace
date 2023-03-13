@@ -7,9 +7,16 @@ export function Navbar() {
       <Link href="/" className="hover:text-blue-500">
         RugU MARKET
       </Link>
-      <div className=" gap-5 flex flex-row items-center hover:text-blue-500">
-        <Link href="/profile"> My NFTs </Link>
-        <ConnectWallet />
+      <div className=" gap-5 flex flex-row items-center ">
+        <Link href="/profile" className="hover:text-blue-500">
+          {" "}
+          My NFTs{" "}
+        </Link>
+        <ConnectWallet
+          accentColor="#fff"
+          colorMode="dark"
+          btnTitle="Connect Wallet"
+        />
       </div>
     </div>
   );
