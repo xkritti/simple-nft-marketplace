@@ -108,7 +108,7 @@ export default function Profile() {
                               quantity: "1",
                               currencyContractAddress: NATIVE_TOKEN_ADDRESS,
                               startTimestamp: new Date(),
-                              listingDurationInSeconds: 0,
+                              listingDurationInSeconds: 2000,
                             });
                           } catch (error) {
                             console.log(error);
